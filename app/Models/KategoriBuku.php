@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\KategoriBukuController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Kategori_buku extends Model
+
+class KategoriBuku extends Model
 {
     use HasFactory;
 

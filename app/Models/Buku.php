@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\BukuController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class Buku extends Model
 {
