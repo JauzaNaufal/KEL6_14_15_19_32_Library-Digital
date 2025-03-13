@@ -42,7 +42,7 @@ class BukuController extends Controller
     {
         try {
             $request->validate([
-                'kategori_id' => 'required|exists:kategori_buku,id',
+                'kategori_id' => 'required|exists:kategori_bukus,id',
                 'nama_buku' => 'required|string|max:255',
                 'judul' => 'required|string|max:255',
                 'penulis' => 'required|string|max:255',
@@ -96,7 +96,7 @@ class BukuController extends Controller
     {
         try {
             $request->validate([
-                'kategori_id' => 'sometimes|exists:kategori_buku,id',
+                'kategori_id' => 'sometimes|exists:kategori_bukus,id',
                 'nama_buku' => 'sometimes|string|max:255',
                 'judul' => 'sometimes|string|max:255',
                 'penulis' => 'sometimes|string|max:255',
