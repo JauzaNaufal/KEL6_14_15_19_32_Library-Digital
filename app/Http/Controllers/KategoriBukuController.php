@@ -15,7 +15,9 @@ class KategoriBukuController extends Controller
     {
         try {
             $kategori = KategoriBuku::all();
-            return response()->json($kategori);
+            return response()->json([
+                "data" => $kategori
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan saat mengambil data kategori',

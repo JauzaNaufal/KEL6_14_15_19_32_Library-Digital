@@ -47,7 +47,7 @@ class BukuController extends Controller
                 'judul' => 'required|string|max:255',
                 'penulis' => 'required|string|max:255',
                 'penerbit' => 'required|string|max:255',
-                'tahun_penerbitan' => 'required|date',
+                'tahun_penerbitan' => 'sometimes|date',
                 'jumlah_tersedia' => 'required|integer|min:1',
             ]);
 
