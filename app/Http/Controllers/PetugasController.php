@@ -4,65 +4,114 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Petugas;
-
+use Illuminate\Validation\ValidationException;
+use Exception;
+use Illuminate\Database\QueryException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PetugasController extends Controller
 {
     public function index()
     {
-        $petugas = Petugas::all();
-        return view('petugas.index', compact('petugas'));
+        try {
+            $petugas = Petugas::all();
+            return response()->json($petugas);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat mengambil data petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    
-    public function create()
-    {
-        return view('petugas.create');
-    }
-
-    
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_petugas' => 'required|string|max:255',
-            'posisi' => 'required|string|max:255',
-            'nomor_telepon' => 'required|numeric',
-            'email' => 'required|email|unique:petugas',
-        ]);
+        try {
+            $request->validate([
+                'nama_petugas' => 'required|string|max:255',
+                'posisi' => 'required|string|max:255',
+                'nomor_telepon' => 'required|numeric',
+                'email' => 'required|email|unique:petugas',
+            ]);
 
-        Petugas::create($request->all());
+            $petugas = Petugas::create($request->all());
 
-        return redirect()->route('petugas.index')->with('success', 'Petugas berhasil ditambahkan');
+            return response()->json([
+                'message' => 'Petugas berhasil ditambahkan',
+                'data' => $petugas
+            ], 201);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Gagal menyimpan data petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    
     public function show($id)
     {
-        $petugas = Petugas::findOrFail($id);
-        return view('petugas.show', compact('petugas'));
+        try {
+            $petugas = Petugas::findOrFail($id);
+            return response()->json($petugas);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Petugas tidak ditemukan'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menampilkan detail petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    
-    public function edit($id)
-    {
-        $petugas = Petugas::findOrFail($id);
-        return view('petugas.edit', compact('petugas'));
-    }
-
-    
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'nama_petugas' => 'sometimes|string|max:255',
-            'posisi' => 'sometimes|string|max:255',
-            'nomor_telepon' => 'sometimes|numeric',
-            'email' => 'sometimes|email|unique:petugas,email,' . $id,
-        ]);
+        try {
+            $request->validate([
+                'nama_petugas' => 'sometimes|string|max:255',
+                'posisi' => 'sometimes|string|max:255',
+                'nomor_telepon' => 'sometimes|numeric',
+                'email' => 'sometimes|email|unique:petugas,email,' . $id,
+            ]);
 
-        $petugas = Petugas::findOrFail($id);
-        $petugas->update($request->all());
+            $petugas = Petugas::findOrFail($id);
+            $petugas->update($request->all());
 
-        return redirect()->route('petugas.index')->with('success', 'Petugas berhasil diperbarui');
+            return response()->json([
+                'message' => 'Petugas berhasil diperbarui',
+                'data' => $petugas
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Petugas tidak ditemukan'
+            ], 404);
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Gagal memperbarui data petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -70,9 +119,27 @@ class PetugasController extends Controller
      */
     public function destroy($id)
     {
-        $petugas = Petugas::findOrFail($id);
-        $petugas->delete();
+        try {
+            $petugas = Petugas::findOrFail($id);
+            $petugas->delete();
 
-        return redirect()->route('petugas.index')->with('success', 'Petugas berhasil dihapus');
+            return response()->json([
+                'message' => 'Petugas berhasil dihapus'
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Petugas tidak ditemukan'
+            ], 404);
+        } catch (QueryException $e) {
+            return response()->json([
+                'message' => 'Gagal menghapus petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus petugas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

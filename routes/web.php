@@ -9,6 +9,4 @@ use App\Http\Controllers\PetugasController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('kategori', KategoriBukuController::class);
-Route::resource('buku', BukuController::class);
-Route::resource('petugas', PetugasController::class);
+

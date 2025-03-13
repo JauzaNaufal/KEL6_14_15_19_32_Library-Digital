@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('penulis');
             $table->string('penerbit');
             $table->datetime('tahun_penerbitan');
-            $table->interger('jumlah_tersedia');
+            $table->integer('jumlah_tersedia');
             $table->timestamps();
         });
     }
