@@ -10,6 +10,22 @@ use Illuminate\Validation\ValidationException;
 
 class AnggotaController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/anggotas",
+     *     summary="Menampilkan semua data anggota",
+     *     tags={"Anggota"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Daftar anggota berhasil diambil"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Terjadi kesalahan saat mengambil data"
+     *     )
+     * )
+     */
+
     public function index()
     {
         try {
@@ -22,6 +38,36 @@ class AnggotaController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Post(
+     *     path="/api/anggotas",
+     *     summary="Menyimpan data anggota baru",
+     *     tags={"Anggota"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama", "nomor_telepon", "email", "tanggal_bergabung"},
+     *             @OA\Property(property="nama", type="string", example="Budi"),
+     *             @OA\Property(property="nomor_telepon", type="string", example="08123456789"),
+     *             @OA\Property(property="email", type="string", format="email", example="budi@example.com"),
+     *             @OA\Property(property="tanggal_bergabung", type="string", format="date", example="2024-01-01")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Anggota berhasil ditambahkan"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Terjadi kesalahan"
+     *     )
+     * )
+     */
 
     public function store(Request $request)
     {
@@ -57,6 +103,33 @@ class AnggotaController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/anggotas/{id}",
+     *     summary="Menampilkan detail anggota",
+     *     tags={"Anggota"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID anggota",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Detail anggota"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Anggota tidak ditemukan"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Terjadi kesalahan"
+     *     )
+     * )
+     */
+
     public function show($id)
     {
         try {
@@ -74,6 +147,45 @@ class AnggotaController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Put(
+     *     path="/api/anggotas/{id}",
+     *     summary="Memperbarui data anggota",
+     *     tags={"Anggota"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID anggota",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="nama", type="string", example="Andi"),
+     *             @OA\Property(property="nomor_telepon", type="string", example="08123456789"),
+     *             @OA\Property(property="email", type="string", format="email", example="andi@example.com"),
+     *             @OA\Property(property="tanggal_bergabung", type="string", format="date", example="2024-01-01")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Anggota berhasil diperbarui"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Anggota tidak ditemukan"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Terjadi kesalahan"
+     *     )
+     * )
+     */
 
     public function update(Request $request, $id)
     {
@@ -114,6 +226,33 @@ class AnggotaController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * @OA\Delete(
+     *     path="/api/anggotas/{id}",
+     *     summary="Menghapus data anggota",
+     *     tags={"Anggota"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID anggota",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Anggota berhasil dihapus"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Anggota tidak ditemukan"
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Terjadi kesalahan"
+     *     )
+     * )
+     */
 
     public function destroy($id)
     {
