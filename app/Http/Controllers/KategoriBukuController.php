@@ -9,8 +9,31 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @OA\Info(
+ *     title="API Kategori Buku",
+ *     version="1.0",
+ *     description="Dokumentasi API untuk pengelolaan kategori buku"
+ * )
+ *
+ * @OA\Tag(
+ *     name="KategoriBuku",
+ *     description="Manajemen Kategori Buku"
+ * )
+ */
 class KategoriBukuController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/kategori",
+     *     tags={"KategoriBuku"},
+     *     summary="Menampilkan semua kategori",
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil mengambil data kategori"
+     *     )
+     * )
+     */
     public function index()
     {
         try {
@@ -26,6 +49,29 @@ class KategoriBukuController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/kategori",
+     *     tags={"KategoriBuku"},
+     *     summary="Menambahkan kategori baru",
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama_kategori"},
+     *             @OA\Property(property="nama_kategori", type="string", example="Novel"),
+     *             @OA\Property(property="deskripsi", type="string", example="Kategori untuk buku novel")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Kategori berhasil ditambahkan"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         try {
@@ -58,6 +104,27 @@ class KategoriBukuController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/kategori/{id}",
+     *     tags={"KategoriBuku"},
+     *     summary="Menampilkan detail kategori berdasarkan ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil menampilkan data kategori"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategori tidak ditemukan"
+     *     )
+     * )
+     */
     public function show($id)
     {
         try {
@@ -75,6 +142,38 @@ class KategoriBukuController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/kategori/{id}",
+     *     tags={"KategoriBuku"},
+     *     summary="Memperbarui kategori berdasarkan ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
+     *             @OA\Property(property="deskripsi", type="string", example="Kategori untuk buku fiksi")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kategori berhasil diperbarui"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategori tidak ditemukan"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -112,6 +211,27 @@ class KategoriBukuController extends Controller
         }
     }
 
+    /**
+     * @OA\Delete(
+     *     path="/api/kategori/{id}",
+     *     tags={"KategoriBuku"},
+     *     summary="Menghapus kategori berdasarkan ID",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Kategori berhasil dihapus"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategori tidak ditemukan"
+     *     )
+     * )
+     */
     public function destroy($id)
     {
         try {
