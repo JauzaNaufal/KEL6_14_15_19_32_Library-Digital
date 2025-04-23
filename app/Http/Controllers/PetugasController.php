@@ -11,6 +11,17 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PetugasController extends Controller
 {
+    /**
+     * @OA\Get(
+     *     path="/api/petugas",
+     *     summary="Menampilkan semua data petugas",
+     *     tags={"Petugas"},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Data petugas berhasil diambil"
+     *     )
+     * )
+     */
     public function index()
     {
         try {
@@ -24,6 +35,31 @@ class PetugasController extends Controller
         }
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/petugas",
+     *     summary="Menambahkan data petugas baru",
+     *     tags={"Petugas"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"nama_petugas","posisi","nomor_telepon","email"},
+     *             @OA\Property(property="nama_petugas", type="string"),
+     *             @OA\Property(property="posisi", type="string"),
+     *             @OA\Property(property="nomor_telepon", type="integer"),
+     *             @OA\Property(property="email", type="string", format="email")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=201,
+     *         description="Petugas berhasil ditambahkan"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
+     *     )
+     * )
+     */
     public function store(Request $request)
     {
         try {
@@ -58,6 +94,27 @@ class PetugasController extends Controller
         }
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/petugas/{id}",
+     *     summary="Menampilkan detail petugas berdasarkan ID",
+     *     tags={"Petugas"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Detail petugas ditemukan"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Petugas tidak ditemukan"
+     *     )
+     * )
+     */
     public function show($id)
     {
         try {
@@ -75,6 +132,35 @@ class PetugasController extends Controller
         }
     }
 
+    /**
+     * @OA\Put(
+     *     path="/api/petugas/{id}",
+     *     summary="Memperbarui data petugas",
+     *     tags={"Petugas"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(
+     *             @OA\Property(property="nama_petugas", type="string"),
+     *             @OA\Property(property="posisi", type="string"),
+     *             @OA\Property(property="nomor_telepon", type="integer"),
+     *             @OA\Property(property="email", type="string", format="email")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Petugas berhasil diperbarui"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Petugas tidak ditemukan"
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -115,7 +201,25 @@ class PetugasController extends Controller
     }
 
     /**
-     * Menghapus data petugas dari database.
+     * @OA\Delete(
+     *     path="/api/petugas/{id}",
+     *     summary="Menghapus data petugas",
+     *     tags={"Petugas"},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Petugas berhasil dihapus"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Petugas tidak ditemukan"
+     *     )
+     * )
      */
     public function destroy($id)
     {
