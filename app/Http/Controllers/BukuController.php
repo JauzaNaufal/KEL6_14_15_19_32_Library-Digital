@@ -11,17 +11,41 @@ use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 /**
- * @OA\Info(
- *     title="Buku API",
- *     version="1.0.0",
- *     description="API untuk manajemen buku",
- *     @OA\Contact(
- *         email="contact@example.com",
- *         name="API Support"
- *     )
+ * @OA\Schema(
+ *     schema="KategoriBukuSchema",
+ *     type="object",
+ *     properties={
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
+ *         @OA\Property(property="deskripsi", type="string", example="Buku-buku fiksi dan novel"),
+ *         @OA\Property(property="created_at", type="string", format="date-time"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time")
+ *     }
  * )
+ *
+ * @OA\Schema(
+ *     schema="BukuSchema",
+ *     type="object",
+ *     properties={
+ *         @OA\Property(property="id", type="integer", example=1),
+ *         @OA\Property(property="kategori_id", type="integer", example=1),
+ *         @OA\Property(property="nama_buku", type="string", example="Harry Potter"),
+ *         @OA\Property(property="judul", type="string", example="Harry Potter and the Philosopher's Stone"),
+ *         @OA\Property(property="penulis", type="string", example="J.K. Rowling"),
+ *         @OA\Property(property="penerbit", type="string", example="Gramedia"),
+ *         @OA\Property(property="tahun_penerbitan", type="string", format="date", example="2001-01-01"),
+ *         @OA\Property(property="jumlah_tersedia", type="integer", example=10),
+ *         @OA\Property(property="created_at", type="string", format="date-time"),
+ *         @OA\Property(property="updated_at", type="string", format="date-time"),
+ *         @OA\Property(
+ *             property="kategori",
+ *             ref="#/components/schemas/KategoriBukuSchema"
+ *         )
+ *     }
+ * )
+ *
+ * Controller for managing books (Buku) in the system
  */
-
 class BukuController extends Controller
 {
     /**
@@ -34,8 +58,13 @@ class BukuController extends Controller
      *         response=200,
      *         description="Berhasil mengambil data buku",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/BukuSchema")
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Berhasil mengambil data buku"),
+     *             @OA\Property(
+     *                 property="buku",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/BukuSchema")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -52,7 +81,10 @@ class BukuController extends Controller
     {
         try {
             $buku = Buku::with('kategori')->get();
-            return response()->json($buku);
+            return response()->json([
+                'message' => 'Berhasil mengambil data buku',
+                'buku' => $buku
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan saat mengambil data buku',
@@ -71,8 +103,13 @@ class BukuController extends Controller
      *         response=200,
      *         description="Berhasil mengambil data kategori",
      *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/KategoriBukuSchema")
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Berhasil mengambil data kategori"),
+     *             @OA\Property(
+     *                 property="kategori",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/KategoriBukuSchema")
+     *             )
      *         )
      *     ),
      *     @OA\Response(
@@ -89,7 +126,10 @@ class BukuController extends Controller
     {
         try {
             $kategori = KategoriBuku::all();
-            return response()->json($kategori);
+            return response()->json([
+                'message' => 'Berhasil mengambil data kategori',
+                'kategori' => $kategori
+            ]);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan saat mengambil data kategori',
@@ -205,7 +245,11 @@ class BukuController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Data buku ditemukan",
-     *         @OA\JsonContent(ref="#/components/schemas/BukuSchema")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Berhasil mengambil detail buku"),
+     *             @OA\Property(property="buku", ref="#/components/schemas/BukuSchema")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -228,7 +272,10 @@ class BukuController extends Controller
     {
         try {
             $buku = Buku::with('kategori')->findOrFail($id);
-            return response()->json($buku);
+            return response()->json([
+                'message' => 'Berhasil mengambil detail buku',
+                'buku' => $buku
+            ]);
         } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => 'Buku tidak ditemukan'

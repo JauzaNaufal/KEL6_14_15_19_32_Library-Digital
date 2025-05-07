@@ -31,6 +31,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 /**
  * @OA\Schema(
  *     schema="KategoriBuku",
+ *     title="KategoriBuku",
+ *     description="Model KategoriBuku",
  *     required={"id", "nama_kategori"},
  *     @OA\Property(property="id", type="integer", format="int64", example=1),
  *     @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
@@ -53,7 +55,7 @@ class KategoriBukuController extends Controller
      *     path="/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan semua kategori",
-     *     operationId="kategoriIndex",
+     *     operationId="getKategoriBukuList",
      *     @OA\Response(
      *         response=200,
      *         description="Berhasil mengambil data kategori",
@@ -61,7 +63,14 @@ class KategoriBukuController extends Controller
      *             @OA\Property(
      *                 property="data",
      *                 type="array",
-     *                 @OA\Items(ref="#/components/schemas/KategoriBuku")
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", format="int64", example=1),
+     *                     @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
+     *                     @OA\Property(property="deskripsi", type="string", example="Buku-buku fiksi dan novel"),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")
+     *                 )
      *             )
      *         )
      *     ),
@@ -95,7 +104,7 @@ class KategoriBukuController extends Controller
      *     path="/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menambahkan kategori baru",
-     *     operationId="kategoriStore",
+     *     operationId="createKategoriBuku",
      *     @OA\RequestBody(
      *         required=true,
      *         description="Data kategori yang akan ditambahkan",
@@ -112,7 +121,12 @@ class KategoriBukuController extends Controller
      *             @OA\Property(property="message", type="string", example="Kategori berhasil ditambahkan"),
      *             @OA\Property(
      *                 property="data",
-     *                 ref="#/components/schemas/KategoriBuku"
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", format="int64", example=1),
+     *                 @OA\Property(property="nama_kategori", type="string", example="Novel"),
+     *                 @OA\Property(property="deskripsi", type="string", example="Kategori untuk buku novel"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")
      *             )
      *         )
      *     ),
@@ -175,7 +189,7 @@ class KategoriBukuController extends Controller
      *     path="/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan detail kategori berdasarkan ID",
-     *     operationId="kategoriShow",
+     *     operationId="getKategoriBukuById",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -186,7 +200,14 @@ class KategoriBukuController extends Controller
      *     @OA\Response(
      *         response=200,
      *         description="Berhasil menampilkan data kategori",
-     *         @OA\JsonContent(ref="#/components/schemas/KategoriBuku")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="id", type="integer", format="int64", example=1),
+     *             @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
+     *             @OA\Property(property="deskripsi", type="string", example="Buku-buku fiksi dan novel"),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=404,
@@ -227,7 +248,7 @@ class KategoriBukuController extends Controller
      *     path="/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Memperbarui kategori berdasarkan ID",
-     *     operationId="kategoriUpdate",
+     *     operationId="updateKategoriBuku",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
@@ -249,7 +270,12 @@ class KategoriBukuController extends Controller
      *             @OA\Property(property="message", type="string", example="Kategori berhasil diperbarui"),
      *             @OA\Property(
      *                 property="data",
-     *                 ref="#/components/schemas/KategoriBuku"
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", format="int64", example=1),
+     *                 @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
+     *                 @OA\Property(property="deskripsi", type="string", example="Kategori untuk buku fiksi"),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")
      *             )
      *         )
      *     ),
@@ -324,7 +350,7 @@ class KategoriBukuController extends Controller
      *     path="/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menghapus kategori berdasarkan ID",
-     *     operationId="kategoriDestroy",
+     *     operationId="deleteKategoriBuku",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
