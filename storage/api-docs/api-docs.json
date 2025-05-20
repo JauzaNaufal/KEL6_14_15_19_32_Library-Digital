@@ -440,6 +440,91 @@
                 }
             }
         },
+        "/api/buku/kategori/{id}": {
+            "get": {
+                "tags": [
+                    "Buku"
+                ],
+                "summary": "Menampilkan buku berdasarkan ID kategori",
+                "operationId": "bukuByKategori",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID kategori buku",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int64",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil mengambil data buku berdasarkan kategori",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil mengambil data buku berdasarkan kategori"
+                                        },
+                                        "kategori": {
+                                            "$ref": "#/components/schemas/KategoriBukuSchema"
+                                        },
+                                        "buku": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/BukuSchema"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kategori tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kategori buku tidak ditemukan"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Kesalahan server",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Terjadi kesalahan saat mengambil data buku"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/buku/{id}": {
             "get": {
                 "tags": [

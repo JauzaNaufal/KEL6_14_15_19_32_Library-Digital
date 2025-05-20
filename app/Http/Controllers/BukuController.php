@@ -139,6 +139,79 @@ class BukuController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *     path="/api/buku/kategori/{id}",
+     *     tags={"Buku"},
+     *     summary="Menampilkan buku berdasarkan ID kategori",
+     *     operationId="bukuByKategori",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="ID kategori buku",
+     *         required=true,
+     *         @OA\Schema(type="integer", format="int64", example=1)
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Berhasil mengambil data buku berdasarkan kategori",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Berhasil mengambil data buku berdasarkan kategori"),
+     *             @OA\Property(
+     *                 property="kategori",
+     *                 ref="#/components/schemas/KategoriBukuSchema"
+     *             ),
+     *             @OA\Property(
+     *                 property="buku",
+     *                 type="array",
+     *                 @OA\Items(ref="#/components/schemas/BukuSchema")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Kategori tidak ditemukan",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Kategori buku tidak ditemukan")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=500,
+     *         description="Kesalahan server",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Terjadi kesalahan saat mengambil data buku"),
+     *             @OA\Property(property="error", type="string", example="Error message")
+     *         )
+     *     )
+     * )
+     */
+    public function getBooksByCategory($id)
+    {
+        try {
+            // Cari kategori terlebih dahulu untuk memastikan kategori tersebut ada
+            $kategori = KategoriBuku::findOrFail($id);
+            
+            // Ambil semua buku yang memiliki kategori_id yang sesuai
+            $buku = Buku::where('kategori_id', $id)->get();
+            
+            return response()->json([
+                'message' => 'Berhasil mengambil data buku berdasarkan kategori',
+                'kategori' => $kategori,
+                'buku' => $buku
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => 'Kategori buku tidak ditemukan'
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat mengambil data buku',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * @OA\Post(
      *     path="/api/buku",
      *     tags={"Buku"},
