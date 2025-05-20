@@ -139,6 +139,89 @@ class BukuController extends Controller
     }
 
     /**
+ * @OA\Get(
+ *     path="/api/buku/search",
+ *     tags={"Buku"},
+ *     summary="Mencari buku berdasarkan judul",
+ *     operationId="bukuSearch",
+ *     @OA\Parameter(
+ *         name="judul",
+ *         in="query",
+ *         description="Kata kunci judul buku",
+ *         required=true,
+ *         @OA\Schema(type="string", example="Harry Potter")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Berhasil menemukan buku",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Berhasil mencari buku berdasarkan judul"),
+ *             @OA\Property(
+ *                 property="buku",
+ *                 type="array",
+ *                 @OA\Items(ref="#/components/schemas/BukuSchema")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Buku tidak ditemukan",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Tidak ada buku yang ditemukan dengan judul tersebut")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Kesalahan server",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Terjadi kesalahan saat mencari buku"),
+ *             @OA\Property(property="error", type="string", example="Error message")
+ *         )
+ *     )
+ * )
+ */
+public function search(Request $request)
+{
+    try {
+        // Validasi parameter judul
+        $request->validate([
+            'judul' => 'required|string'
+        ]);
+
+        $keyword = $request->input('judul');
+
+        // Cari buku berdasarkan judul menggunakan LIKE untuk pencarian parsial
+        $buku = Buku::with('kategori')
+            ->where('judul', 'LIKE', '%' . $keyword . '%')
+            ->orWhere('nama_buku', 'LIKE', '%' . $keyword . '%')
+            ->get();
+
+        // Jika tidak ada buku yang ditemukan
+        if ($buku->isEmpty()) {
+            return response()->json([
+                'message' => 'Tidak ada buku yang ditemukan dengan judul tersebut'
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Berhasil mencari buku berdasarkan judul',
+            'buku' => $buku
+        ]);
+    } catch (ValidationException $e) {
+        return response()->json([
+            'message' => 'Validasi gagal',
+            'errors' => $e->errors()
+        ], 422);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Terjadi kesalahan saat mencari buku',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+    /**
      * @OA\Get(
      *     path="/api/buku/kategori/{id}",
      *     tags={"Buku"},
@@ -190,10 +273,10 @@ class BukuController extends Controller
         try {
             // Cari kategori terlebih dahulu untuk memastikan kategori tersebut ada
             $kategori = KategoriBuku::findOrFail($id);
-            
+
             // Ambil semua buku yang memiliki kategori_id yang sesuai
             $buku = Buku::where('kategori_id', $id)->get();
-            
+
             return response()->json([
                 'message' => 'Berhasil mengambil data buku berdasarkan kategori',
                 'kategori' => $kategori,

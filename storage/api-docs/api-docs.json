@@ -440,6 +440,87 @@
                 }
             }
         },
+        "/api/buku/search": {
+            "get": {
+                "tags": [
+                    "Buku"
+                ],
+                "summary": "Mencari buku berdasarkan judul",
+                "operationId": "bukuSearch",
+                "parameters": [
+                    {
+                        "name": "judul",
+                        "in": "query",
+                        "description": "Kata kunci judul buku",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "Harry Potter"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Berhasil menemukan buku",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Berhasil mencari buku berdasarkan judul"
+                                        },
+                                        "buku": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/BukuSchema"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Buku tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tidak ada buku yang ditemukan dengan judul tersebut"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Kesalahan server",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Terjadi kesalahan saat mencari buku"
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "Error message"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/buku/kategori/{id}": {
             "get": {
                 "tags": [
