@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://127.0.0.1:8000/api",
+            "url": "http://127.0.0.1:8000/",
             "description": "Local server"
         },
         {
@@ -387,13 +387,13 @@
                 }
             }
         },
-        "/api/kategori": {
+        "/api/buku/kategori-list": {
             "get": {
                 "tags": [
                     "Buku"
                 ],
                 "summary": "Menampilkan semua kategori buku",
-                "operationId": "kategoriIndex",
+                "operationId": "bukuKategoriList",
                 "responses": {
                     "200": {
                         "description": "Berhasil mengambil data kategori",
@@ -901,7 +901,7 @@
                 }
             }
         },
-        "/kategori": {
+        "/api/kategori": {
             "get": {
                 "tags": [
                     "KategoriBuku"
@@ -1096,7 +1096,7 @@
                 }
             }
         },
-        "/kategori/{id}": {
+        "/api/kategori/{id}": {
             "get": {
                 "tags": [
                     "KategoriBuku"
@@ -1492,25 +1492,13 @@
                 }
             }
         },
-        "/api/petugas": {
-            "get": {
-                "tags": [
-                    "Petugas"
-                ],
-                "summary": "Menampilkan semua data petugas",
-                "operationId": "c6b8df43c226b5616df0c3b2aac9f1e4",
-                "responses": {
-                    "200": {
-                        "description": "Data petugas berhasil diambil"
-                    }
-                }
-            },
+        "/api/auth/register": {
             "post": {
                 "tags": [
-                    "Petugas"
+                    "Authentication"
                 ],
-                "summary": "Menambahkan data petugas baru",
-                "operationId": "973a6acc3b79ba6e2f1526219c5b7387",
+                "summary": "Registrasi petugas baru",
+                "operationId": "8178c468972df647c74d1122ee6cdb2e",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -1520,21 +1508,37 @@
                                     "nama_petugas",
                                     "posisi",
                                     "nomor_telepon",
-                                    "email"
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
                                 ],
                                 "properties": {
                                     "nama_petugas": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "John Doe"
                                     },
                                     "posisi": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Admin"
                                     },
                                     "nomor_telepon": {
-                                        "type": "integer"
+                                        "type": "string",
+                                        "example": "081234567890"
                                     },
                                     "email": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
                                     }
                                 },
                                 "type": "object"
@@ -1544,7 +1548,26 @@
                 },
                 "responses": {
                     "201": {
-                        "description": "Petugas berhasil ditambahkan"
+                        "description": "Registrasi berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Registrasi berhasil"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validasi gagal"
@@ -1552,65 +1575,32 @@
                 }
             }
         },
-        "/api/petugas/{id}": {
-            "get": {
+        "/api/auth/login": {
+            "post": {
                 "tags": [
-                    "Petugas"
+                    "Authentication"
                 ],
-                "summary": "Menampilkan detail petugas berdasarkan ID",
-                "operationId": "5e0975084bd03a252b1af52c16784c48",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Detail petugas ditemukan"
-                    },
-                    "404": {
-                        "description": "Petugas tidak ditemukan"
-                    }
-                }
-            },
-            "put": {
-                "tags": [
-                    "Petugas"
-                ],
-                "summary": "Memperbarui data petugas",
-                "operationId": "5648579aee880022109aeaad9fdc40eb",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
+                "summary": "Login petugas",
+                "operationId": "b75537f75b352f232b1eda07549360da",
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
                                 "properties": {
-                                    "nama_petugas": {
-                                        "type": "string"
-                                    },
-                                    "posisi": {
-                                        "type": "string"
-                                    },
-                                    "nomor_telepon": {
-                                        "type": "integer"
-                                    },
                                     "email": {
                                         "type": "string",
-                                        "format": "email"
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
                                     }
                                 },
                                 "type": "object"
@@ -1620,37 +1610,239 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Petugas berhasil diperbarui"
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login berhasil"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Petugas tidak ditemukan"
+                    "401": {
+                        "description": "Kredensial tidak valid"
                     }
                 }
-            },
-            "delete": {
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
                 "tags": [
-                    "Petugas"
+                    "Authentication"
                 ],
-                "summary": "Menghapus data petugas",
-                "operationId": "38e3e9a7479da601945c1b11d74be2c1",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "integer"
-                        }
-                    }
-                ],
+                "summary": "Logout petugas",
+                "operationId": "0a9570ec6846d170704be7bc55b303de",
                 "responses": {
                     "200": {
-                        "description": "Petugas berhasil dihapus"
+                        "description": "Logout berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout berhasil"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     },
-                    "404": {
-                        "description": "Petugas tidak ditemukan"
+                    "401": {
+                        "description": "Tidak terautentikasi"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/profile": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Mendapatkan profil petugas yang sedang login",
+                "operationId": "fc14427e41fc86be773315a81f789a1d",
+                "responses": {
+                    "200": {
+                        "description": "Data profil berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Tidak terautentikasi"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/update-profile": {
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Update profil petugas yang sedang login",
+                "operationId": "f3033bc02623f7617425ac526d2d955d",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nama_petugas": {
+                                        "type": "string",
+                                        "example": "John Doe Updated"
+                                    },
+                                    "posisi": {
+                                        "type": "string",
+                                        "example": "Super Admin"
+                                    },
+                                    "nomor_telepon": {
+                                        "type": "string",
+                                        "example": "081234567891"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john.updated@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profil berhasil diperbarui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profil berhasil diperbarui"
+                                        },
+                                        "user": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Tidak terautentikasi"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/change-password": {
+            "put": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Mengubah password petugas yang sedang login",
+                "operationId": "20486e336f9278b74b7013778b40b61d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password123"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpassword123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "newpassword123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password berhasil diubah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Password berhasil diubah"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Tidak terautentikasi atau password lama salah"
+                    },
+                    "422": {
+                        "description": "Validasi gagal"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -1758,8 +1950,8 @@
             "description": "Buku"
         },
         {
-            "name": "Petugas",
-            "description": "Petugas"
+            "name": "Authentication",
+            "description": "Authentication"
         }
     ]
 }

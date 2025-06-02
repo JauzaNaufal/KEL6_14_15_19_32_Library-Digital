@@ -8,14 +8,24 @@ use App\Http\Controllers\PetugasController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\KategoriBukuController;
 
-Route::apiResource('anggotas', AnggotaController::class);
-Route::apiResource('peminjamen', PeminjamanController::class);
-Route::apiResource('petugas', PetugasController::class);
-Route::apiResource('bukus', BukuController::class);
-Route::apiResource('kategori', KategoriBukuController::class);
 
 
+Route::prefix('auth')->group(function () {
+    Route::post('register', [PetugasController::class, 'register']);
+    Route::post('login', [PetugasController::class, 'login']);
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('logout', [PetugasController::class, 'logout']);
+        Route::get('profile', [PetugasController::class, 'profile']);
+        Route::put('update-profile', [PetugasController::class, 'updateProfile']);
+        Route::put('change-password', [PetugasController::class, 'changePassword']);
+    });
+});
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::apiResource('anggotas', AnggotaController::class);
+    Route::apiResource('peminjamen', PeminjamanController::class);
+    Route::apiResource('petugas', PetugasController::class);
+    Route::apiResource('bukus', BukuController::class);
+    Route::apiResource('kategori', KategoriBukuController::class);
+});

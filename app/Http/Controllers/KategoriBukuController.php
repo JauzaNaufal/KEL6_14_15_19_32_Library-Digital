@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\KategoriBuku;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+
+
 
 /**
  * @OA\Info(
@@ -22,27 +25,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
  */
 
 /**
- * @OA\Server(
- *     url="/api",
- *     description="API Server"
- * )
- */
-
-/**
- * @OA\Schema(
- *     schema="KategoriBuku",
- *     title="KategoriBuku",
- *     description="Model KategoriBuku",
- *     required={"id", "nama_kategori"},
- *     @OA\Property(property="id", type="integer", format="int64", example=1),
- *     @OA\Property(property="nama_kategori", type="string", example="Fiksi"),
- *     @OA\Property(property="deskripsi", type="string", example="Buku-buku fiksi dan novel"),
- *     @OA\Property(property="created_at", type="string", format="date-time", example="2023-01-01T00:00:00Z"),
- *     @OA\Property(property="updated_at", type="string", format="date-time", example="2023-01-01T00:00:00Z")
- * )
- */
-
-/**
  * @OA\Tag(
  *     name="KategoriBuku",
  *     description="Manajemen Kategori Buku"
@@ -52,7 +34,7 @@ class KategoriBukuController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/kategori",
+     *     path="/api/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan semua kategori",
      *     operationId="getKategoriBukuList",
@@ -101,7 +83,7 @@ class KategoriBukuController extends Controller
 
     /**
      * @OA\Post(
-     *     path="/kategori",
+     *     path="/api/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menambahkan kategori baru",
      *     operationId="createKategoriBuku",
@@ -152,41 +134,45 @@ class KategoriBukuController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'nama_kategori' => 'required|string|max:255',
-                'deskripsi' => 'nullable|string',
-            ]);
 
-            $kategori = KategoriBuku::create($request->all());
+     public function store(Request $request)
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'nama_kategori' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+        ]);
 
-            return response()->json([
-                'message' => 'Kategori berhasil ditambahkan',
-                'data' => $kategori
-            ], 201);
-        } catch (ValidationException $e) {
+        if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validasi gagal',
-                'errors' => $e->errors()
+                'errors' => $validator->errors()
             ], 422);
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Gagal menyimpan data kategori',
-                'error' => $e->getMessage()
-            ], 500);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Terjadi kesalahan',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
+        $kategori = KategoriBuku::create($request->only(['nama_kategori', 'deskripsi']));
+
+        return response()->json([
+            'message' => 'Kategori berhasil ditambahkan',
+            'data' => $kategori
+        ], 201);
+    } catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Gagal menyimpan data kategori',
+            'error' => $e->getMessage()
+        ], 500);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Terjadi kesalahan',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * @OA\Get(
-     *     path="/kategori/{id}",
+     *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan detail kategori berdasarkan ID",
      *     operationId="getKategoriBukuById",
@@ -245,7 +231,7 @@ class KategoriBukuController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/kategori/{id}",
+     *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Memperbarui kategori berdasarkan ID",
      *     operationId="updateKategoriBuku",
@@ -309,45 +295,48 @@ class KategoriBukuController extends Controller
      * )
      */
     public function update(Request $request, $id)
-    {
-        try {
-            $request->validate([
-                'nama_kategori' => 'sometimes|string|max:255',
-                'deskripsi' => 'nullable|string',
-            ]);
+{
+    try {
+        $validator = Validator::make($request->all(), [
+            'nama_kategori' => 'sometimes|required|string|max:255',
+            'deskripsi' => 'nullable|string',
+        ]);
 
-            $kategori = KategoriBuku::findOrFail($id);
-            $kategori->update($request->all());
-
-            return response()->json([
-                'message' => 'Kategori berhasil diperbarui',
-                'data' => $kategori
-            ]);
-        } catch (ValidationException $e) {
+        if ($validator->fails()) {
             return response()->json([
                 'message' => 'Validasi gagal',
-                'errors' => $e->errors()
+                'errors' => $validator->errors()
             ], 422);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'Kategori tidak ditemukan'
-            ], 404);
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Gagal memperbarui data kategori',
-                'error' => $e->getMessage()
-            ], 500);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Terjadi kesalahan',
-                'error' => $e->getMessage()
-            ], 500);
         }
+
+        $kategori = KategoriBuku::findOrFail($id);
+        $kategori->update($request->only(['nama_kategori', 'deskripsi']));
+
+        return response()->json([
+            'message' => 'Kategori berhasil diperbarui',
+            'data' => $kategori
+        ]);
+    } catch (ModelNotFoundException $e) {
+        return response()->json([
+            'message' => 'Kategori tidak ditemukan'
+        ], 404);
+    } catch (QueryException $e) {
+        return response()->json([
+            'message' => 'Gagal memperbarui data kategori',
+            'error' => $e->getMessage()
+        ], 500);
+    } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Terjadi kesalahan',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
+
 
     /**
      * @OA\Delete(
-     *     path="/kategori/{id}",
+     *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menghapus kategori berdasarkan ID",
      *     operationId="deleteKategoriBuku",

@@ -4,55 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Petugas;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Exception;
 use Illuminate\Database\QueryException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 
 class PetugasController extends Controller
 {
     /**
-     * @OA\Get(
-     *     path="/api/petugas",
-     *     summary="Menampilkan semua data petugas",
-     *     tags={"Petugas"},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Data petugas berhasil diambil"
-     *     )
-     * )
-     */
-    public function index()
-    {
-        try {
-            $petugas = Petugas::all();
-            return response()->json($petugas);
-        } catch (Exception $e) {
-            return response()->json([
-                'message' => 'Terjadi kesalahan saat mengambil data petugas',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
      * @OA\Post(
-     *     path="/api/petugas",
-     *     summary="Menambahkan data petugas baru",
-     *     tags={"Petugas"},
+     *     path="/api/auth/register",
+     *     summary="Registrasi petugas baru",
+     *     tags={"Authentication"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(
-     *             required={"nama_petugas","posisi","nomor_telepon","email"},
-     *             @OA\Property(property="nama_petugas", type="string"),
-     *             @OA\Property(property="posisi", type="string"),
-     *             @OA\Property(property="nomor_telepon", type="integer"),
-     *             @OA\Property(property="email", type="string", format="email")
+     *             required={"nama_petugas","posisi","nomor_telepon","email","password","password_confirmation"},
+     *             @OA\Property(property="nama_petugas", type="string", example="John Doe"),
+     *             @OA\Property(property="posisi", type="string", example="Admin"),
+     *             @OA\Property(property="nomor_telepon", type="string", example="081234567890"),
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="password123")
      *         )
      *     ),
      *     @OA\Response(
      *         response=201,
-     *         description="Petugas berhasil ditambahkan"
+     *         description="Registrasi berhasil",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Registrasi berhasil"),
+     *             @OA\Property(property="user", type="object"),
+     *             @OA\Property(property="token", type="string")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=422,
@@ -60,22 +44,34 @@ class PetugasController extends Controller
      *     )
      * )
      */
-    public function store(Request $request)
+    public function register(Request $request)
     {
         try {
             $request->validate([
                 'nama_petugas' => 'required|string|max:255',
                 'posisi' => 'required|string|max:255',
-                'nomor_telepon' => 'required|numeric',
-                'email' => 'required|email|unique:petugas',
+                'nomor_telepon' => 'required|string|max:20',
+                'email' => 'required|email|unique:petugas,email',
+                'password' => 'required|string|min:8',
             ]);
 
-            $petugas = Petugas::create($request->all());
+            $petugas = Petugas::create([
+                'nama_petugas' => $request->nama_petugas,
+                'posisi' => $request->posisi,
+                'nomor_telepon' => $request->nomor_telepon,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            $token = $petugas->createToken('auth_token')->plainTextToken;
 
             return response()->json([
-                'message' => 'Petugas berhasil ditambahkan',
-                'data' => $petugas
+                'message' => 'Registrasi berhasil',
+                'user' => $petugas,
+                'token' => $token,
+                'token_type' => 'Bearer'
             ], 201);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validasi gagal',
@@ -83,12 +79,117 @@ class PetugasController extends Controller
             ], 422);
         } catch (QueryException $e) {
             return response()->json([
-                'message' => 'Gagal menyimpan data petugas',
+                'message' => 'Gagal melakukan registrasi',
                 'error' => $e->getMessage()
             ], 500);
         } catch (Exception $e) {
             return response()->json([
                 'message' => 'Terjadi kesalahan',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="Login petugas",
+     *     tags={"Authentication"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\JsonContent(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="john@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="password123")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Login berhasil",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Login berhasil"),
+     *             @OA\Property(property="user", type="object"),
+     *             @OA\Property(property="token", type="string")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Kredensial tidak valid"
+     *     )
+     * )
+     */
+    public function login(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|string',
+            ]);
+
+            $petugas = Petugas::where('email', $request->email)->first();
+
+            if (!$petugas || !Hash::check($request->password, $petugas->password)) {
+                return response()->json([
+                    'message' => 'Email atau password tidak valid'
+                ], 401);
+            }
+
+            // Hapus token lama
+            $petugas->tokens()->delete();
+
+            $token = $petugas->createToken('auth_token')->plainTextToken;
+
+            return response()->json([
+                'message' => 'Login berhasil',
+                'user' => $petugas,
+                'token' => $token,
+                'token_type' => 'Bearer'
+            ], 200);
+
+        } catch (ValidationException $e) {
+            return response()->json([
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat login',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     summary="Logout petugas",
+     *     tags={"Authentication"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Logout berhasil",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Logout berhasil")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=401,
+     *         description="Tidak terautentikasi"
+     *     )
+     * )
+     */
+    public function logout(Request $request)
+    {
+        try {
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'message' => 'Logout berhasil'
+            ], 200);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat logout',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -96,37 +197,33 @@ class PetugasController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/petugas/{id}",
-     *     summary="Menampilkan detail petugas berdasarkan ID",
-     *     tags={"Petugas"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
+     *     path="/api/auth/profile",
+     *     summary="Mendapatkan profil petugas yang sedang login",
+     *     tags={"Authentication"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
-     *         description="Detail petugas ditemukan"
+     *         description="Data profil berhasil diambil",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="user", type="object")
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Petugas tidak ditemukan"
+     *         response=401,
+     *         description="Tidak terautentikasi"
      *     )
      * )
      */
-    public function show($id)
+    public function profile(Request $request)
     {
         try {
-            $petugas = Petugas::findOrFail($id);
-            return response()->json($petugas);
-        } catch (ModelNotFoundException $e) {
             return response()->json([
-                'message' => 'Petugas tidak ditemukan'
-            ], 404);
+                'user' => $request->user()
+            ], 200);
+
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Terjadi kesalahan saat menampilkan detail petugas',
+                'message' => 'Terjadi kesalahan saat mengambil profil',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -134,114 +231,140 @@ class PetugasController extends Controller
 
     /**
      * @OA\Put(
-     *     path="/api/petugas/{id}",
-     *     summary="Memperbarui data petugas",
-     *     tags={"Petugas"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         @OA\Schema(type="integer")
-     *     ),
+     *     path="/api/auth/update-profile",
+     *     summary="Update profil petugas yang sedang login",
+     *     tags={"Authentication"},
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         @OA\JsonContent(
-     *             @OA\Property(property="nama_petugas", type="string"),
-     *             @OA\Property(property="posisi", type="string"),
-     *             @OA\Property(property="nomor_telepon", type="integer"),
-     *             @OA\Property(property="email", type="string", format="email")
+     *             @OA\Property(property="nama_petugas", type="string", example="John Doe Updated"),
+     *             @OA\Property(property="posisi", type="string", example="Super Admin"),
+     *             @OA\Property(property="nomor_telepon", type="string", example="081234567891"),
+     *             @OA\Property(property="email", type="string", format="email", example="john.updated@example.com")
      *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Petugas berhasil diperbarui"
+     *         description="Profil berhasil diperbarui",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Profil berhasil diperbarui"),
+     *             @OA\Property(property="user", type="object")
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Petugas tidak ditemukan"
+     *         response=401,
+     *         description="Tidak terautentikasi"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
      *     )
      * )
      */
-    public function update(Request $request, $id)
+    public function updateProfile(Request $request)
     {
         try {
+            $user = $request->user();
+
             $request->validate([
                 'nama_petugas' => 'sometimes|string|max:255',
                 'posisi' => 'sometimes|string|max:255',
-                'nomor_telepon' => 'sometimes|numeric',
-                'email' => 'sometimes|email|unique:petugas,email,' . $id,
+                'nomor_telepon' => 'sometimes|string|max:20',
+                'email' => 'sometimes|email|unique:petugas,email,' . $user->id,
             ]);
 
-            $petugas = Petugas::findOrFail($id);
-            $petugas->update($request->all());
+            $user->update($request->only(['nama_petugas', 'posisi', 'nomor_telepon', 'email']));
 
             return response()->json([
-                'message' => 'Petugas berhasil diperbarui',
-                'data' => $petugas
-            ]);
+                'message' => 'Profil berhasil diperbarui',
+                'user' => $user->fresh()
+            ], 200);
+
         } catch (ValidationException $e) {
             return response()->json([
                 'message' => 'Validasi gagal',
                 'errors' => $e->errors()
             ], 422);
-        } catch (ModelNotFoundException $e) {
-            return response()->json([
-                'message' => 'Petugas tidak ditemukan'
-            ], 404);
         } catch (QueryException $e) {
             return response()->json([
-                'message' => 'Gagal memperbarui data petugas',
+                'message' => 'Gagal memperbarui profil',
                 'error' => $e->getMessage()
             ], 500);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Terjadi kesalahan',
+                'message' => 'Terjadi kesalahan saat memperbarui profil',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
     /**
-     * @OA\Delete(
-     *     path="/api/petugas/{id}",
-     *     summary="Menghapus data petugas",
-     *     tags={"Petugas"},
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
+     * @OA\Put(
+     *     path="/api/auth/change-password",
+     *     summary="Mengubah password petugas yang sedang login",
+     *     tags={"Authentication"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\RequestBody(
      *         required=true,
-     *         @OA\Schema(type="integer")
+     *         @OA\JsonContent(
+     *             required={"current_password","password","password_confirmation"},
+     *             @OA\Property(property="current_password", type="string", format="password", example="password123"),
+     *             @OA\Property(property="password", type="string", format="password", example="newpassword123"),
+     *             @OA\Property(property="password_confirmation", type="string", format="password", example="newpassword123")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
-     *         description="Petugas berhasil dihapus"
+     *         description="Password berhasil diubah",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Password berhasil diubah")
+     *         )
      *     ),
      *     @OA\Response(
-     *         response=404,
-     *         description="Petugas tidak ditemukan"
+     *         response=401,
+     *         description="Tidak terautentikasi atau password lama salah"
+     *     ),
+     *     @OA\Response(
+     *         response=422,
+     *         description="Validasi gagal"
      *     )
      * )
      */
-    public function destroy($id)
+    public function changePassword(Request $request)
     {
         try {
-            $petugas = Petugas::findOrFail($id);
-            $petugas->delete();
+            $request->validate([
+                'current_password' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+            ]);
+
+            $user = $request->user();
+
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'message' => 'Password lama tidak sesuai'
+                ], 401);
+            }
+
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
+
+            // Hapus semua token untuk memaksa login ulang
+            $user->tokens()->delete();
 
             return response()->json([
-                'message' => 'Petugas berhasil dihapus'
-            ]);
-        } catch (ModelNotFoundException $e) {
+                'message' => 'Password berhasil diubah. Silakan login kembali.'
+            ], 200);
+
+        } catch (ValidationException $e) {
             return response()->json([
-                'message' => 'Petugas tidak ditemukan'
-            ], 404);
-        } catch (QueryException $e) {
-            return response()->json([
-                'message' => 'Gagal menghapus petugas',
-                'error' => $e->getMessage()
-            ], 500);
+                'message' => 'Validasi gagal',
+                'errors' => $e->errors()
+            ], 422);
         } catch (Exception $e) {
             return response()->json([
-                'message' => 'Terjadi kesalahan saat menghapus petugas',
+                'message' => 'Terjadi kesalahan saat mengubah password',
                 'error' => $e->getMessage()
             ], 500);
         }
