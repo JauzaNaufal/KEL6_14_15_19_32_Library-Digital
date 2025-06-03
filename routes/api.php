@@ -23,8 +23,11 @@ Route::prefix('auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('buku/search', [BukuController::class, 'search']);
+    Route::get('buku/kategori-list', [BukuController::class, 'getKategori']);
+    Route::get('buku/kategori/{id}', [BukuController::class, 'getBooksByCategory']);
     Route::apiResource('anggotas', AnggotaController::class);
-    Route::apiResource('peminjamen', PeminjamanController::class);
+    Route::apiResource('peminjaman', PeminjamanController::class);
     Route::apiResource('petugas', PetugasController::class);
     Route::apiResource('buku', BukuController::class);
     Route::apiResource('kategori', KategoriBukuController::class);
