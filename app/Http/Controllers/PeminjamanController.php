@@ -21,6 +21,7 @@ class PeminjamanController extends Controller
      *     path="/api/peminjaman",
      *     tags={"Peminjaman"},
      *     summary="Menampilkan semua data peminjaman",
+     *     security={{"bearerAuth":{}}},
      *     @OA\Response(
      *         response=200,
      *         description="Berhasil menampilkan daftar peminjaman"
@@ -38,6 +39,7 @@ class PeminjamanController extends Controller
      *     path="/api/peminjaman",
      *     tags={"Peminjaman"},
      *     summary="Membuat data peminjaman baru",
+     *     security={{"bearerAuth":{}}},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\JsonContent(

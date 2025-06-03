@@ -7,8 +7,8 @@ use OpenApi\Attributes as OA;
 /**
  * @OA\Info(
  *     version="1.0.0",
- *     title="API Portal Berita",
- *     description="Portal Berita API Documentation"
+ *     title="API Perupustakaan",
+ *     description="Perpupstakaan API Documentation"
  * )
  * @OA\Server(
  *     url="http://127.0.0.1:8000/",

@@ -14,6 +14,7 @@ class AnggotaController extends Controller
      * @OA\Get(
      *     path="/api/anggotas",
      *     summary="Menampilkan semua data anggota",
+     *     security={{"bearerAuth":{}}},
      *     tags={"Anggota"},
      *     @OA\Response(
      *         response=200,
@@ -43,6 +44,7 @@ class AnggotaController extends Controller
      * @OA\Post(
      *     path="/api/anggotas",
      *     summary="Menyimpan data anggota baru",
+     *     security={{"bearerAuth":{}}},
      *     tags={"Anggota"},
      *     @OA\RequestBody(
      *         required=true,
@@ -107,6 +109,7 @@ class AnggotaController extends Controller
      * @OA\Get(
      *     path="/api/anggotas/{id}",
      *     summary="Menampilkan detail anggota",
+     *     security={{"bearerAuth":{}}},
      *     tags={"Anggota"},
      *     @OA\Parameter(
      *         name="id",
@@ -152,6 +155,7 @@ class AnggotaController extends Controller
      * @OA\Put(
      *     path="/api/anggotas/{id}",
      *     summary="Memperbarui data anggota",
+     *     security={{"bearerAuth":{}}},
      *     tags={"Anggota"},
      *     @OA\Parameter(
      *         name="id",
@@ -231,6 +235,7 @@ class AnggotaController extends Controller
      * @OA\Delete(
      *     path="/api/anggotas/{id}",
      *     summary="Menghapus data anggota",
+     *     security={{"bearerAuth":{}}},
      *     tags={"Anggota"},
      *     @OA\Parameter(
      *         name="id",

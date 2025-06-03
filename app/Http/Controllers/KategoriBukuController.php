@@ -37,6 +37,7 @@ class KategoriBukuController extends Controller
      *     path="/api/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan semua kategori",
+     *     security={{"bearerAuth":{}}},
      *     operationId="getKategoriBukuList",
      *     @OA\Response(
      *         response=200,
@@ -86,6 +87,7 @@ class KategoriBukuController extends Controller
      *     path="/api/kategori",
      *     tags={"KategoriBuku"},
      *     summary="Menambahkan kategori baru",
+     *     security={{"bearerAuth":{}}},
      *     operationId="createKategoriBuku",
      *     @OA\RequestBody(
      *         required=true,
@@ -175,6 +177,7 @@ class KategoriBukuController extends Controller
      *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menampilkan detail kategori berdasarkan ID",
+     *     security={{"bearerAuth":{}}},
      *     operationId="getKategoriBukuById",
      *     @OA\Parameter(
      *         name="id",
@@ -234,6 +237,7 @@ class KategoriBukuController extends Controller
      *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Memperbarui kategori berdasarkan ID",
+     *     security={{"bearerAuth":{}}},
      *     operationId="updateKategoriBuku",
      *     @OA\Parameter(
      *         name="id",
@@ -339,6 +343,7 @@ class KategoriBukuController extends Controller
      *     path="/api/kategori/{id}",
      *     tags={"KategoriBuku"},
      *     summary="Menghapus kategori berdasarkan ID",
+     *     security={{"bearerAuth":{}}},
      *     operationId="deleteKategoriBuku",
      *     @OA\Parameter(
      *         name="id",

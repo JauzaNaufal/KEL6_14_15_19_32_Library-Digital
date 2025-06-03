@@ -53,6 +53,7 @@ class BukuController extends Controller
      *     path="/api/buku",
      *     tags={"Buku"},
      *     summary="Menampilkan semua buku",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuIndex",
      *     @OA\Response(
      *         response=200,
@@ -98,6 +99,7 @@ class BukuController extends Controller
      *     path="/api/buku/kategori-list",
      *     tags={"Buku"},
      *     summary="Menampilkan semua kategori buku",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuKategoriList",
      *     @OA\Response(
      *         response=200,
@@ -143,6 +145,7 @@ class BukuController extends Controller
      *     path="/api/buku/search",
      *     tags={"Buku"},
      *     summary="Mencari buku berdasarkan judul",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuSearch",
      *     @OA\Parameter(
      *         name="judul",
@@ -226,6 +229,7 @@ class BukuController extends Controller
      *     path="/api/buku/kategori/{id}",
      *     tags={"Buku"},
      *     summary="Menampilkan buku berdasarkan ID kategori",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuByKategori",
      *     @OA\Parameter(
      *         name="id",
@@ -299,6 +303,7 @@ class BukuController extends Controller
      *     path="/api/buku",
      *     tags={"Buku"},
      *     summary="Menambahkan buku baru",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuStore",
      *     @OA\RequestBody(
      *         required=true,
@@ -389,6 +394,7 @@ class BukuController extends Controller
      *     path="/api/buku/{id}",
      *     tags={"Buku"},
      *     summary="Menampilkan detail buku berdasarkan ID",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuShow",
      *     @OA\Parameter(
      *         name="id",
@@ -448,6 +454,7 @@ class BukuController extends Controller
      *     path="/api/buku/{id}",
      *     tags={"Buku"},
      *     summary="Memperbarui data buku",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuUpdate",
      *     @OA\Parameter(
      *         name="id",
@@ -555,6 +562,7 @@ class BukuController extends Controller
      *     path="/api/buku/{id}",
      *     tags={"Buku"},
      *     summary="Menghapus buku berdasarkan ID",
+     *     security={{"bearerAuth":{}}},
      *     operationId="bukuDestroy",
      *     @OA\Parameter(
      *         name="id",

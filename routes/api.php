@@ -26,6 +26,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('anggotas', AnggotaController::class);
     Route::apiResource('peminjamen', PeminjamanController::class);
     Route::apiResource('petugas', PetugasController::class);
-    Route::apiResource('bukus', BukuController::class);
+    Route::apiResource('buku', BukuController::class);
     Route::apiResource('kategori', KategoriBukuController::class);
 });
